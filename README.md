@@ -211,15 +211,6 @@ For questions or improvements, open an issue or submit a PR.
 
 ## Architecture & Concepts
 
-### High-Level Architecture
-
-```mermaid
-flowchart LR
-    FE[React Frontend] -->|HTTP/JSON| API[Spring Boot API]
-    API --> SVC[Service Layer]
-    SVC --> DB[(MySQL)]
-    API --> SEC[Security (Spring Security + JWT)]
-```
 
 - Controllers expose REST endpoints consumed by the React app.
 - Services implement business rules (stock adjustments, validation, authorization checks).
