@@ -12,7 +12,7 @@ const Sidebar = () => {
 
   return (
     <div className="sidebar">
-      <h1 className="ims">IMS</h1>
+      <h1 className="ims">SIMS</h1>
       <ul className="nav-links">
         {isAuth && (
           <li>
