@@ -34,3 +34,9 @@ frontend/node_modules/
 .vscode/
 .idea/
 *.iml
+
+# Ignore environment files
+.env
+*.env
+**/.env
+backend/src/main/resources/.env
