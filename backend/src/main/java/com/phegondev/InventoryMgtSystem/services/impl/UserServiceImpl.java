@@ -43,27 +43,34 @@ public class UserServiceImpl implements UserService {
             role = registerRequest.getRole();
         }
 
-        User userToSave = User.builder()
-                .name(registerRequest.getName())
-                .email(registerRequest.getEmail())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .phoneNumber(registerRequest.getPhoneNumber())
-                .role(role)
-                .build();
+        String normalizedEmail = registerRequest.getEmail() == null ? null : registerRequest.getEmail().trim().toLowerCase();
 
-        userRepository.save(userToSave);
+        User userToSave = User.builder()
+            .name(registerRequest.getName())
+            .email(normalizedEmail)
+            .password(passwordEncoder.encode(registerRequest.getPassword()))
+            .phoneNumber(registerRequest.getPhoneNumber())
+            .role(role)
+            .build();
+
+        User saved = userRepository.save(userToSave);
+
+        log.info("Registered new user id={} email={}", saved.getId(), saved.getEmail());
 
         return Response.builder()
-                .status(200)
-                .message("User was successfully registered")
-                .build();
+            .status(200)
+            .message("User was successfully registered")
+            .build();
     }
 
     @Override
     public Response loginUser(LoginRequest loginRequest) {
+        String email = loginRequest.getEmail() == null ? null : loginRequest.getEmail().trim().toLowerCase();
 
-        User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new NotFoundException("Email Not Found"));
+        log.info("Login attempt for email={}", email);
+
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException("Email Not Found"));
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("Password Does Not Match");
@@ -138,12 +145,14 @@ public class UserServiceImpl implements UserService {
         if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         }
-        userRepository.save(existingUser);
+        User saved = userRepository.save(existingUser);
+
+        log.info("Updated user id={} email={}", saved.getId(), saved.getEmail());
 
         return Response.builder()
-                .status(200)
-                .message("User successfully updated")
-                .build();
+            .status(200)
+            .message("User successfully updated")
+            .build();
     }
 
     @Override

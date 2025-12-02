@@ -1,134 +1,136 @@
-<h1 align="center">Smart Inventory Management System</h1>
+# Smart Inventory Management System
 
-Modern Inventory Management System with a Spring Boot (Java 21) backend and a React frontend. Provides user authentication, product & category management, supplier tracking, purchase/sales transactions, and reporting support.
+## Running Without Docker
+- Backend: Run with Maven
+	- `cd backend`
+	- `./mvnw spring-boot:run` (Linux/Mac)
+	- `mvnw.cmd spring-boot:run` (Windows)
+- Frontend: Run with Node
+	- `cd frontend`
+	- `npm install`
+	- `npm start`
 
-## Features
+Ensure MySQL is running locally and update `backend/src/main/resources/application.properties` with the correct JDBC URL, username, and password.
 
-- User registration, login, profile management
-- Role-based access (via Spring Security & JWT)
-- Product CRUD with categories & pagination
-- Supplier management
-- Purchase & sales transactions, status tracking
-- Basic dashboard metrics
-- MySQL persistence (Spring Data JPA)
-- DTO mapping via ModelMapper
+Modern Inventory Management System with a Spring Boot (Java 21) backend and a React frontend. The project ships with Docker support (backend, frontend, MySQL) so you can start everything with a single `docker compose up` command.
+
+---
+
+## Highlights
+
+- Full‑stack app: Spring Boot REST API (Java 21, Maven) + React (Create React App)
+- JWT authentication and role-based access control
+- MySQL persistence (Spring Data JPA / Hibernate)
+- File upload support and optional AWS S3 integration
+- Dockerized for local development: `docker-compose.yml` included
+
+---
 
 ## Tech Stack
 
-| Layer      | Technology |
-|------------|-----------|
-| Backend    | Spring Boot 3.3.5, Java 21, Maven |
-| Security   | Spring Security + JWT (jjwt) |
-| Persistence| Spring Data JPA, MySQL |
-| Frontend   | React (CRA), JavaScript |
-| Utilities  | ModelMapper, AWS SDK S3 (optional uploads) |
+| Layer | Technology |
+|---|---|
+| Backend | Spring Boot 3.3.5, Java 21, Maven |
+| Security | Spring Security, JWT (jjwt) |
+| Persistence | Spring Data JPA (Hibernate), MySQL |
+| Frontend | React 18 (CRA), Axios, React Router |
+| Build & Run | Maven, npm, Docker, Docker Compose |
 
-> Planned upgrade: Spring Boot 3.5.x (pending confirmation). This README reflects current version (3.3.5).
+---
 
-## Repository Structure
-
-```
-backend/
-    pom.xml
-    src/main/java/com/phegondev/InventoryMgtSystem/... (controllers, services, repositories, security)
-    src/main/resources/application.properties
-    src/test/java/... (tests)
-frontend/
-    package.json
-    src/ (pages, components, services)
-```
-
-## Prerequisites
-
-- JDK 21 (matches `pom.xml` property `java.version`)
-- Maven (or use the included wrapper `mvnw.cmd`)
-- Node.js 18+ & npm
-- MySQL 8.x (or compatible) running locally or accessible
-
-## Configuration (`backend/src/main/resources/application.properties`)
-
-Set database and JWT values (example):
+## Repository Layout
 
 ```
-spring.datasource.url=jdbc:mysql://localhost:3306/inventory_db
-spring.datasource.username=your_user
-spring.datasource.password=your_password
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=false
-
-app.jwt.secret=change_me_to_a_secure_value
-app.jwt.expiration=3600000
+F:/1/Smart Inventory
+├─ backend/                # Spring Boot app (pom.xml, src/)
+├─ frontend/               # React app (package.json, src/)
+├─ docker-compose.yml      # Compose stack for local development
+├─ .dockerignore
+└─ README.md
 ```
 
-Adjust AWS/S3 or other external service properties if used.
+---
 
-## MySQL Setup (local)
+## Quick Start (Docker)
 
-If you are using MySQL for local development, create the database and user that match `backend/src/main/resources/application.properties`.
+Requirements: Docker and Docker Compose (v1.27+ or Docker Compose v2).
 
-1) Open a MySQL shell as a privileged user (root) and run:
-
-```sql
--- replace root access method as needed
-CREATE DATABASE IF NOT EXISTS inventory CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS 'inventory'@'localhost' IDENTIFIED BY '123456789';
-GRANT ALL PRIVILEGES ON inventory.* TO 'inventory'@'localhost';
-FLUSH PRIVILEGES;
-```
-
-2) From Windows PowerShell you can check/start the MySQL service if it's stopped:
+1. From repository root run:
 
 ```powershell
-Get-Service *mysql*    # lists mysql services (MySQL, MySQL80, etc.)
-Start-Service MySQL80  # start named service (adjust name shown by Get-Service)
+# build images and start services in background
+docker compose up -d --build
 ```
 
-3) If you prefer to run the SQL commands from PowerShell (using the mysql CLI):
+2. Wait for services to become healthy (MySQL initialization may take a few seconds).
+
+3. Open the apps:
+
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5050 (example: `GET /api/products/all`)
+
+4. Stop and remove containers + volumes (data):
 
 ```powershell
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS inventory CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mysql -u root -p -e "CREATE USER IF NOT EXISTS 'inventory'@'localhost' IDENTIFIED BY '123456789';"
-mysql -u root -p -e "GRANT ALL PRIVILEGES ON inventory.* TO 'inventory'@'localhost'; FLUSH PRIVILEGES;"
+docker compose down -v
 ```
 
-4) Update `backend/src/main/resources/application.properties` if you used a different database name, username, or password.
+Notes:
+- Compose creates a MySQL service named `db`. The backend service connects using `jdbc:mysql://db:3306/inventory`.
+- The compose file passes environment variables to the backend; these are read by `backend/src/main/resources/application.properties`.
 
-Note: For quick local development (no MySQL), run the backend with the `dev` profile which uses H2 in-memory (see "Run with a dev profile (H2 in-memory)" above).
+---
 
-## Backend: Build & Run (Windows PowerShell)
+## What the Compose stack includes
 
-Use your system Maven (`mvn`) or the project wrapper if present. The project in `application.properties` sets the backend port to `5050`.
+- `db` — MySQL 8.0 with persistent named volume `db-data`.
+- `backend` — built from `backend/Dockerfile`; runs the Spring Boot jar and exposes port `5050`.
+- `frontend` — built from `frontend/Dockerfile`; React app built then served by Nginx on port `80` mapped to host `3000`.
 
-Run with system Maven (recommended):
+If you need production-ready behavior (secrets, backups, scaling), adapt the compose file or use Kubernetes.
 
-```powershell
-cd backend
-# Build and run tests
-mvn -U clean verify
+---
 
-# Run the app
-mvn spring-boot:run
+## Environment and Configuration
+
+You can provide configuration via environment variables (recommended). The backend supports these variables (examples):
+
+```
+DATASOURCE_URL     # e.g. jdbc:mysql://db:3306/inventory
+DATASOURCE_USER
+DATASOURCE_PASSWORD
+SERVER_PORT        # default 5050
+SECRETE_JWT_STRING # JWT secret
 ```
 
-Run with a dev profile (H2 in-memory) if you want DB isolation for local dev:
+Example `.env` (DO NOT commit secrets to VCS):
+
+```
+DATASOURCE_URL=jdbc:mysql://db:3306/inventory
+DATASOURCE_USER=inventory
+DATASOURCE_PASSWORD=123456789
+SECRETE_JWT_STRING=change_this_secret
+SERVER_PORT=5050
+```
+
+Place that file at the repository root if you want docker compose to pick it up, or provide env vars in your CI/CD pipeline.
+
+---
+
+## Local development (without Docker)
+
+Backend (Windows PowerShell):
 
 ```powershell
 cd backend
-mvn -Dspring-boot.run.profiles=dev spring-boot:run
+# set environment variables for the run (temporary in this session)
+$env:DATASOURCE_URL='jdbc:mysql://localhost:3306/inventory'
+$env:DATASOURCE_USER='inventory'
+$env:DATASOURCE_PASSWORD='123456789'
+mvnw.cmd -U spring-boot:run
 ```
 
-Or build and run the packaged jar:
-
-```powershell
-cd backend
-mvn -U clean package
-java -jar target/InventoryMgtSystem-0.0.1-SNAPSHOT.jar
-```
-
-Default backend port (current `application.properties`): `5050`.
-Example auth endpoint: `http://localhost:5050/api/auth/login`.
-
-## Frontend: Install & Start
+Frontend (dev server):
 
 ```powershell
 cd frontend
@@ -136,145 +138,73 @@ npm install
 npm start
 ```
 
-Frontend dev server: `http://localhost:3000`
-Ensure API base URL in `frontend/src/service/ApiService.js` points to the backend, e.g. `http://localhost:5050`.
+The frontend dev server expects the backend at `http://localhost:5050`; adjust `frontend/src/service/ApiService.js` if needed.
 
-## Testing
+---
 
-Backend tests:
+## Healthchecks & Startup ordering
+
+The Compose stack provided is simple and relies on Docker's `depends_on` so the backend starts after the DB container creation. For robustness in CI/dev you should add a startup wait strategy (e.g., `wait-for-it.sh`, `dockerize`, or a Spring retry on startup) so the backend retries connecting until MySQL is ready.
+
+If you want, I can add a small `wait-for` entrypoint to the backend container so it waits until port 3306 on `db` is reachable before starting the JVM.
+
+---
+
+## Running tests
+
+Backend unit/integration tests (Maven):
+
 ```powershell
 cd backend
 mvn test
 ```
 
 Frontend tests:
+
 ```powershell
 cd frontend
 npm test
 ```
 
-## Common Troubleshooting
+---
 
-- DB connection errors: verify MySQL is running & credentials match.
-- Port conflicts: change `server.port` in `application.properties` or set React dev server port via `set PORT=3001` before `npm start`.
-- CORS: implement a global CORS config or annotate controllers with `@CrossOrigin`.
-- JWT issues: ensure `app.jwt.secret` is non-empty and consistent.
+## Troubleshooting
 
-## Deployment
-
-Backend production build:
-```powershell
-cd backend
-mvn -U clean package
-```
-Deploy jar or create a Docker image (example Dockerfile snippet):
-```
-FROM eclipse-temurin:21-jre
-WORKDIR /app
-COPY target/InventoryMgtSystem-0.0.1-SNAPSHOT.jar app.jar
-ENTRYPOINT ["java","-jar","app.jar"]
-```
-
-Frontend production build:
-```powershell
-cd frontend
-npm run build
-```
-Serve the `build/` directory via Nginx, Apache, or integrate into Spring Boot static resources.
-
-## Upgrade Notes (Spring Boot 3.5.x)
-
-When upgrading:
-- Update parent `<version>` in `backend/pom.xml` to `3.5.x`.
-- Re-run tests for deprecated APIs (notably security, validation changes).
-- Review release notes for configuration property shifts.
-
-## Quick Start Checklist
-
-1. Install JDK 21, Maven, Node.js.
-2. Configure `application.properties` (DB + JWT).
-3. Start backend: `./mvnw.cmd spring-boot:run`.
-4. Start frontend: `npm start`.
-5. Login/register and begin managing inventory.
-
-## License
-
-Provide appropriate license information here (e.g., MIT). Currently unspecified.
-
-## Screenshots
-
-<img width="800" alt="Dashboard Screenshot" src="https://github.com/user-attachments/assets/d81fa291-eb4f-4805-b773-033bbd3c8936" />
-<img width="800" alt="Transactions Screenshot" src="https://github.com/user-attachments/assets/4679436a-ba3f-4d65-87f6-d949d7b5ddf6" />
+- "Driver ... claims to not accept jdbcUrl, ${DATASOURCE_URL}" — means Spring didn't receive the env var. Fix by exporting env vars (see Local development) or running via Compose which passes them.
+- DB connection refused — ensure Docker engine running, or that MySQL is listening on `localhost:3306` for local runs.
+- Port conflicts — change ports in `docker-compose.yml` or `application.properties`.
 
 ---
-For questions or improvements, open an issue or submit a PR.
 
-## Architecture & Concepts
+## Production notes
 
+- For production builds, create images using a secure build pipeline, store secrets in a secrets manager, and use a managed database or apply secure backups.
+- Consider using a multi-stage build with a non-root runtime user for the backend image (the current `backend/Dockerfile` is multi-stage).
 
-- Controllers expose REST endpoints consumed by the React app.
-- Services implement business rules (stock adjustments, validation, authorization checks).
-- Repositories (Spring Data JPA) handle persistence to MySQL.
-- Security uses JWTs for stateless auth; tokens are sent via `Authorization: Bearer <token>`.
+---
 
-### Domain Model (Simplified)
+## Upgrade notes (Spring Boot 3.5.x)
 
-```mermaid
-classDiagram
-    class User {
-        Long id
-        String username
-        String email
-        Set<Role> roles
-    }
-    class Product {
-        Long id
-        String name
-        String sku
-        int quantity
-        BigDecimal price
-    }
-    class Category {
-        Long id
-        String name
-    }
-    class Supplier {
-        Long id
-        String name
-        String contact
-    }
-    class Transaction {
-        Long id
-        Date createdAt
-        TransactionType type  // PURCHASE or SALE
-        TransactionStatus status
-    }
-    class TransactionItem {
-        Long id
-        int quantity
-        BigDecimal unitPrice
-    }
+When upgrading:
 
-    Product --> Category
-    Product --> Supplier
-    Transaction "1" --> "many" TransactionItem
-    TransactionItem --> Product
-    Transaction --> User
-```
+1. Update the parent version in `backend/pom.xml` to `3.5.x`.
+2. Run the full test suite and manually check security config (Spring Security may introduce configuration changes across minor versions).
+3. Read the Spring Boot 3.5 release notes for property name changes.
 
-Notes:
-- Stock quantity is derived from the net effect of transactions or maintained by service logic.
-- Use database constraints and service-level validation to keep SKU unique and quantities non-negative.
+---
 
-### Typical Flows
-- Login: credentials → JWT issued → subsequent requests authenticated.
-- Purchase: create transaction items → increase product quantities → persist audit trail.
-- Sale: validate inventory → decrease quantities → record transaction.
+## Contributing
 
-### Controller Overview
-- `AuthController`, `UserController`: authentication, user profile/roles.
-- `ProductController`, `CategoryController`: catalog CRUD with pagination.
-- `SupplierController`: supplier registry management.
-- `TransactionController`: purchase/sales creation and lookup.
+1. Create a branch for your changes.
+2. Run unit tests: `mvn test` (backend) and `npm test` (frontend).
+3. Open a pull request describing the change.
 
-> See the controller classes in `backend/src/main/java/com/phegondev/InventoryMgtSystem/controllers/` for exact routes.
+---
+
+If you'd like, I can also:
+
+- Add a `wait-for` wrapper so the backend waits for MySQL readiness before starting.
+- Add Compose healthchecks and a small `init.sql` to seed the database with test data.
+- Add GitHub Actions workflows to build Docker images and run tests in CI.
+
+Tell me which of the above you'd like me to implement next.

@@ -1,0 +1,38 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: inventory
+      MYSQL_USER: inventory
+      MYSQL_PASSWORD: 123456789
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db-data:/var/lib/mysql
+    # Expose to host on 3307 for tooling; backend uses internal 3306
+    ports:
+      - "3307:3306"
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATASOURCE_URL: jdbc:mysql://db:3306/inventory
+      DATASOURCE_USER: inventory
+      DATASOURCE_PASSWORD: 123456789
+      SERVER_PORT: 5050
+    ports:
+      - "5050:5050"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  db-data:

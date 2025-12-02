@@ -30,13 +30,24 @@ target/
 # Frontend dependencies
 frontend/node_modules/
 
+# Backend build output (explicit)
+backend/target/
+
+# Frontend build output
+frontend/build/
+
 # IDE settings and project files
 .vscode/
 .idea/
 *.iml
 
-# Ignore environment files
+# Ignore environment files (keep out of VCS)
 .env
-*.env
+.env.*
 **/.env
 backend/src/main/resources/.env
+
+# OS / tooling
+npm-debug.log*
+yarn-error.log*
+.DS_Store
