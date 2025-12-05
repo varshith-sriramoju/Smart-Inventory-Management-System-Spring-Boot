@@ -1,16 +1,68 @@
 # Smart Inventory Management System
 
 ## Running Without Docker
-- Backend: Run with Maven
-	- `cd backend`
-	- `./mvnw spring-boot:run` (Linux/Mac)
-	- `mvnw.cmd spring-boot:run` (Windows)
-- Frontend: Run with Node
-	- `cd frontend`
-	- `npm install`
-	- `npm start`
 
-Ensure MySQL is running locally and update `backend/src/main/resources/application.properties` with the correct JDBC URL, username, and password.
+Backend (Windows PowerShell):
+
+```powershell
+cd backend
+# Set environment variables for this session
+$env:DATASOURCE_URL = 'jdbc:mysql://localhost:3306/inventory'
+$env:DATASOURCE_USER = 'inventory'
+$env:DATASOURCE_PASSWORD = '123456789'
+
+# Start Spring Boot (skip tests for faster startup)
+mvnw.cmd -U -DskipTests spring-boot:run
+```
+
+Backend (Linux/macOS):
+
+```bash
+cd backend
+export DATASOURCE_URL='jdbc:mysql://localhost:3306/inventory'
+export DATASOURCE_USER='inventory'
+export DATASOURCE_PASSWORD='123456789'
+
+# Make wrapper executable once
+chmod +x ./mvnw
+
+# Start Spring Boot (skip tests for faster startup)
+./mvnw -U -DskipTests spring-boot:run
+```
+
+Backend (Google Cloud Shell):
+
+```bash
+# Ensure Java 21 is available (Cloud Shell may already have it)
+java -version || sudo apt-get update && sudo apt-get install -y openjdk-21-jdk
+
+cd backend
+export DATASOURCE_URL='jdbc:mysql://localhost:3306/inventory'
+export DATASOURCE_USER='inventory'
+export DATASOURCE_PASSWORD='123456789'
+
+./mvnw -U -DskipTests spring-boot:run
+# Use Web Preview -> port 5050 to open the app
+```
+
+Frontend (Node):
+
+```powershell
+cd frontend
+npm install
+
+# Optionally point frontend at a non-default API
+# set REACT_APP_API_BASE_URL to override http://localhost:5050/api
+# PowerShell:
+$env:REACT_APP_API_BASE_URL = 'http://localhost:5050/api'
+
+npm start
+```
+
+Notes:
+- Ensure MySQL is running locally and reachable at `localhost:3306`. Create the `inventory` database and user (`inventory/123456789`) or adjust the env vars above.
+- The backend reads env vars first; otherwise it falls back to `jdbc:mysql://db:3306/inventory` (for Docker). For local runs, prefer setting env vars as shown.
+- Backend default port is `5050`. Visit `http://localhost:5050/api/health/db` to verify DB connectivity.
 
 Modern Inventory Management System with a Spring Boot (Java 21) backend and a React frontend. The project ships with Docker support (backend, frontend, MySQL) so you can start everything with a single `docker compose up` command.
 

@@ -3,7 +3,7 @@ import CryptoJS from "crypto-js";
 
 export default class ApiService {
 
-    static BASE_URL = "http://localhost:5050/api";
+    static BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5050/api";
     static ENCRYPTION_KEY = "phegon-dev-inventory";
 
 
@@ -260,7 +260,7 @@ export default class ApiService {
         })
         return response.data;
     }
-    
+
 
     static async returnToSupplier(body) {
         const response = await axios.post(`${this.BASE_URL}/transactions/return`, body, {
