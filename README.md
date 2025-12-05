@@ -31,6 +31,10 @@ Smart-Inventory-Management-System/
 
 ---
 
+## Cloud (Supabase Postgres)
+
+---
+
 # ⚙️ Backend – Run Without Docker
 
 ## **Windows PowerShell**
@@ -89,6 +93,61 @@ Backend URL:
 ```
 http://localhost:5050
 ```
+
+---
+
+## 🔀 Choose Database Profile (MySQL local vs Supabase cloud)
+
+Set `SPRING_PROFILES_ACTIVE` to switch which properties file is used:
+
+- `local` → uses `application-local.properties` (MySQL)
+- `cloud` → uses `application-cloud.properties` (Postgres/Supabase)
+
+Examples (Windows PowerShell):
+
+```powershell
+# Local MySQL (default if backend/.env sets SPRING_PROFILES_ACTIVE=local)
+cd backend
+$env:SPRING_PROFILES_ACTIVE='local'
+$env:DATASOURCE_URL='jdbc:mysql://localhost:3306/inventory'
+$env:DATASOURCE_USER='inventory'
+$env:DATASOURCE_PASSWORD='123456789'
+.\mvnw.cmd -U -DskipTests spring-boot:run
+# Cloud Supabase (Postgres)
+cd backend
+$env:SPRING_PROFILES_ACTIVE='cloud'
+$env:SUPABASE_DB_URL='jdbc:postgresql://<your-host>:5432/postgres?sslmode=require'
+$env:SUPABASE_DB_USER='<your-user>'
+$env:SUPABASE_DB_PASSWORD='<your-password>'
+.
+.\mvnw.cmd -U -DskipTests spring-boot:run
+```
+
+Linux/macOS:
+
+```bash
+# Local MySQL
+cd backend
+export SPRING_PROFILES_ACTIVE=local
+export DATASOURCE_URL='jdbc:mysql://localhost:3306/inventory'
+export DATASOURCE_USER='inventory'
+export DATASOURCE_PASSWORD='123456789'
+./mvnw -U -DskipTests spring-boot:run
+
+# Cloud Supabase
+cd backend
+export SPRING_PROFILES_ACTIVE=cloud
+export SUPABASE_DB_URL='jdbc:postgresql://<your-host>:5432/postgres?sslmode=require'
+export SUPABASE_DB_USER='<your-user>'
+export SUPABASE_DB_PASSWORD='<your-password>'
+./mvnw -U -DskipTests spring-boot:run
+```
+
+Profile files:
+- `backend/src/main/resources/application-local.properties` (MySQL)
+- `backend/src/main/resources/application-cloud.properties` (Supabase/Postgres)
+
+Note: If your Supabase password contains special characters like `@`, either URL‑encode it in the JDBC URL, or set `SUPABASE_DB_USER` and `SUPABASE_DB_PASSWORD` separately and leave the credentials out of the URL.
 
 ---
 

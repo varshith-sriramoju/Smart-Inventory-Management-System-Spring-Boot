@@ -47,6 +47,10 @@ frontend/build/
 **/.env
 backend/src/main/resources/.env
 
+# Properties files (often contain secrets or environment-specific configs)
+*.properties
+**/*.properties
+
 # OS / tooling
 npm-debug.log*
 yarn-error.log*
