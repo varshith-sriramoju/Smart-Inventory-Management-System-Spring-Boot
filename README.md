@@ -43,8 +43,10 @@ $env:DATASOURCE_URL = 'jdbc:mysql://localhost:3306/inventory'
 $env:DATASOURCE_USER = 'inventory'
 $env:DATASOURCE_PASSWORD = '123456789'
 
-# Start Spring Boot
 .\mvnw.cmd -U -DskipTests spring-boot:run
+
+# Start Spring Boot
+mvn spring-boot:run
 ```
 
 ---
@@ -220,5 +222,3 @@ Healthcheck endpoints:
 - Harden Docker images (non-root user, multi-stage builds)
 
 ---
-
-
