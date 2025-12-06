@@ -41,17 +41,26 @@ frontend/build/
 .idea/
 *.iml
 
-# Ignore environment files (keep out of VCS)
+# Ignore environment files (keep secrets out of VCS)
+# Allow checked-in examples (e.g., .env.example)
 .env
 .env.*
+!*.env.example
 **/.env
+!**/.env.example
 backend/src/main/resources/.env
 
 # Properties files (often contain secrets or environment-specific configs)
+# Allow example templates to be committed
 *.properties
 **/*.properties
+!*example.properties
+!**/*example.properties
+!*.properties.example
+!**/*.properties.example
 
 # OS / tooling
 npm-debug.log*
 yarn-error.log*
+# macOS Finder metadata
 .DS_Store
