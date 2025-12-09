@@ -1,6 +1,6 @@
 # Example: Cloud profile (Supabase Postgres)
 # Copy to application-cloud.properties and adjust as needed
-
+spring.application.name=SmartInventorySystem-Cloud
 # Use sslmode=require for Supabase
 spring.datasource.url=jdbc:postgresql://YOUR_DB_HOST:5432/postgres?sslmode=require
 spring.datasource.username=YOUR_DB_USER
