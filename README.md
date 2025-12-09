@@ -1,7 +1,5 @@
-# 📦 Smart Inventory Management System(SIMS)
-
+# 📦 Smart Inventory Management System
 Live Demo: https://smartinventorysystems.netlify.app/
-
 A modern, full-stack **Inventory Management System** built using
 **Spring Boot (Java 21)** + **React**, with **MySQL**, **JWT Authentication**, and full **Docker** support.
 
